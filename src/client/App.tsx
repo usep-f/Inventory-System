@@ -1,31 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useAuth } from './context/AuthContext';
+import RoleSelector from './features/auth/RoleSelector';
+import DashboardLayout from './features/dashboard/DashboardLayout';
+import ScannerLayout from './features/scanner/ScannerLayout';
 
 export default function App() {
-  const [status] = useState('Repository Setup Completed!');
+  const { role, isAuthenticated } = useAuth();
 
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      fontFamily: 'system-ui, sans-serif',
-      background: '#0d1117',
-      color: '#c9d1d9'
-    }}>
-      <h1 style={{ color: '#58a6ff' }}>Local Inventory System</h1>
-      <p>{status}</p>
-      <div style={{
-        marginTop: '20px',
-        padding: '15px',
-        border: '1px solid #30363d',
-        borderRadius: '6px',
-        background: '#161b22',
-        fontSize: '0.9em'
-      }}>
-        Ready to implement dashboard and scanning features.
-      </div>
-    </div>
-  );
+  if (!isAuthenticated) {
+    return <RoleSelector />;
+  }
+
+  if (role === 'pc') {
+    return <DashboardLayout />;
+  }
+
+  if (role === 'mobile') {
+    return <ScannerLayout />;
+  }
+
+  return <div>Unknown state</div>;
 }
