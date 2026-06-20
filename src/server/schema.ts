@@ -24,6 +24,12 @@ export const logs = sqliteTable('logs', {
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
 
+export const settings = sqliteTable('settings', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  pin: text('pin').notNull().default('1234'),
+  port: integer('port').notNull().default(3000),
+});
+
 // ==========================================
 // 2. Input Validation Schemas (Zod)
 // ==========================================
@@ -80,8 +86,8 @@ export const scanActionSchema = z.object({
 
 export const loginSchema = z.object({
   pin: pinSchema,
-  role: z.enum(['SCANNER', 'DASHBOARD'], {
-    errorMap: () => ({ message: 'Role must be SCANNER or DASHBOARD' })
+  role: z.enum(['pc', 'mobile'], {
+    errorMap: () => ({ message: 'Role must be pc or mobile' })
   })
 });
 
@@ -90,6 +96,8 @@ export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Log = typeof logs.$inferSelect;
 export type NewLog = typeof logs.$inferInsert;
+export type Settings = typeof settings.$inferSelect;
+export type NewSettings = typeof settings.$inferInsert;
 
 export type ProductInput = z.infer<typeof productInputSchema>;
 export type ScanActionInput = z.infer<typeof scanActionSchema>;
