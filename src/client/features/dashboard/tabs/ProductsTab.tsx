@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit, Trash2, Plus, Search } from 'lucide-react';
+import { Edit, Trash2, Search } from 'lucide-react';
 import { Product } from '../../../data/mockData';
 import ProductFormModal from './ProductFormModal';
 import { Card } from '../../../components/ui/Card';
@@ -66,11 +66,6 @@ export default function ProductsTab({ products, addProduct, updateProduct, delet
     setModalOpen(true);
   };
 
-  const handleOpenAdd = () => {
-    setEditProduct(null);
-    setModalOpen(true);
-  };
-
   return (
     <Card style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
@@ -85,10 +80,6 @@ export default function ProductsTab({ products, addProduct, updateProduct, delet
             style={{ paddingLeft: '40px' }}
           />
         </div>
-        <Button onClick={handleOpenAdd}>
-          <Plus size={16} />
-          <span>Add product</span>
-        </Button>
       </div>
 
       <div style={{ overflowX: 'auto' }}>

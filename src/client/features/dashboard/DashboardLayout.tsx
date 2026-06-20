@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Package, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useDashboardState } from '../../hooks/useDashboardState';
 import OverviewTab from './tabs/OverviewTab';
@@ -25,23 +25,22 @@ function NavItem({ label, active, onClick, icon }: NavItemProps) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '14px',
-        width: '100%',
-        padding: '12px 18px',
+        gap: '8px',
+        padding: '10px 16px',
         border: 'none',
         borderRadius: '12px',
-        background: active ? 'var(--sidebar-item-active)' : 'transparent',
+        background: active ? 'var(--primary)' : 'transparent',
         color: active ? '#fff' : 'var(--sidebar-text)',
         fontFamily: 'var(--font-sans)',
         fontSize: '0.9rem',
         fontWeight: active ? 600 : 500,
-        textAlign: 'left',
-        transition: 'all 0.2s ease',
+        transition: 'all 0.3s ease-out',
+        boxShadow: active ? '0 10px 20px rgba(79, 134, 247, 0.2)' : 'none',
+        transform: active ? 'translateY(-1px)' : 'none',
       }}
     >
       {icon}
-      <span style={{ flex: 1 }}>{label}</span>
-      <ChevronRight size={14} style={{ opacity: active ? 0.7 : 0.3 }} />
+      <span>{label}</span>
     </button>
   );
 }
@@ -84,44 +83,61 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100dvh' }}>
-      {/* ─── Dark Sidebar ─── */}
-      <aside style={{
-        width: '260px',
-        background: 'var(--sidebar-bg)',
-        padding: '28px 16px',
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh', background: 'var(--page-bg)' }}>
+      {/* ─── Glassmorphism Navbar ─── */}
+      <header style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 'var(--z-sticky)',
+        width: '100%',
+        background: 'rgba(26, 31, 55, 0.85)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+        padding: '16px 32px',
         display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
       }}>
-        <div style={{ padding: '0 12px', marginBottom: '36px' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
-            Inventory
-          </h2>
-          <span style={{ fontSize: '0.72rem', color: 'var(--sidebar-text)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-            Local Console
-          </span>
+        {/* Logo area */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', margin: 0, lineHeight: 1 }}>
+              Inventory
+            </h2>
+            <span style={{ fontSize: '0.72rem', color: 'var(--sidebar-text)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Local Console
+            </span>
+          </div>
+
+          <div style={{ width: '1px', height: '32px', background: 'rgba(255, 255, 255, 0.1)' }} />
+
+          {/* Navigation */}
+          <nav style={{ display: 'flex', gap: '12px' }}>
+            <NavItem label="Dashboard" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<LayoutDashboard size={18} />} />
+            <NavItem label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Package size={18} />} />
+            <NavItem label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={18} />} />
+          </nav>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-          <NavItem label="Dashboard" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<LayoutDashboard size={18} />} />
-          <NavItem label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Package size={18} />} />
-          <NavItem label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={18} />} />
-        </nav>
-      </aside>
+        {/* Actions */}
+        <div>
+          <Button variant="ghost" onClick={logout} style={{ fontSize: '0.85rem', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }} icon={<LogOut size={14} />}>
+            Logout
+          </Button>
+        </div>
+      </header>
 
       {/* ─── Main Content ─── */}
-      <main style={{ flex: 1, padding: '28px 32px', overflowY: 'auto', background: 'var(--page-bg)' }}>
-        <PageHeader
-          title={meta.title}
-          subtitle={meta.subtitle}
-          action={
-            <Button variant="ghost" onClick={logout} style={{ fontSize: '0.8rem' }} icon={<LogOut size={14} />}>
-              Logout
-            </Button>
-          }
-        />
-        {renderActiveTab()}
+      <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <PageHeader
+            title={meta.title}
+            subtitle={meta.subtitle}
+          />
+          {renderActiveTab()}
+        </div>
       </main>
     </div>
   );
