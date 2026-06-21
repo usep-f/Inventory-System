@@ -1,12 +1,46 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/library';
 
+interface AdvancedConstraint extends MediaTrackConstraintSet {
+  focusMode?: 'none' | 'manual' | 'single-shot' | 'continuous';
+  zoom?: number;
+}
+
+interface ZoomTrackCapabilities extends MediaTrackCapabilities {
+  zoom?: {
+    min: number;
+    max: number;
+    step: number;
+  };
+}
+
+const CAMERA_CONSTRAINTS: MediaStreamConstraints = {
+  video: { 
+    facingMode: 'environment',
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    advanced: [
+      { focusMode: 'continuous' }
+    ] as AdvancedConstraint[]
+  }
+};
+
+export interface ZoomCapabilities {
+  min: number;
+  max: number;
+  step: number;
+}
+
 export function useScanner() {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [zoomCapabilities, setZoomCapabilities] = useState<ZoomCapabilities | null>(null);
+  
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const trackRef = useRef<MediaStreamTrack | null>(null);
   
   useEffect(() => {
     readerRef.current = new BrowserMultiFormatReader();
@@ -20,25 +54,25 @@ export function useScanner() {
 
   const startScanning = useCallback(async (videoElement: HTMLVideoElement) => {
     try {
-      interface AdvancedConstraint extends MediaTrackConstraintSet {
-        focusMode?: 'none' | 'manual' | 'single-shot' | 'continuous';
-        zoom?: number;
-      }
-
-      const constraints: MediaStreamConstraints = {
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          advanced: [
-            { focusMode: 'continuous' }
-          ] as AdvancedConstraint[]
-        }
-      };
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(CAMERA_CONSTRAINTS);
       streamRef.current = stream;
       
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        trackRef.current = track;
+        if (typeof track.getCapabilities === 'function') {
+          const caps = track.getCapabilities() as ZoomTrackCapabilities;
+          if (caps.zoom) {
+            setZoomCapabilities({
+              min: caps.zoom.min || 1,
+              max: caps.zoom.max || 1,
+              step: caps.zoom.step || 0.1
+            });
+            setZoom(caps.zoom.min || 1);
+          }
+        }
+      }
+
       videoElement.srcObject = stream;
       videoElement.setAttribute('autoplay', 'true');
       videoElement.setAttribute('muted', 'true');
@@ -66,11 +100,39 @@ export function useScanner() {
     }
   }, []);
 
+  const changeZoom = useCallback(async (zoomValue: number) => {
+    if (!trackRef.current) {
+      setZoom(zoomValue);
+      return;
+    }
+    try {
+      if (typeof trackRef.current.getCapabilities === 'function') {
+        const caps = trackRef.current.getCapabilities() as ZoomTrackCapabilities;
+        if (caps.zoom) {
+          const min = caps.zoom.min || 1;
+          const max = caps.zoom.max || 1;
+          const clamped = Math.max(min, Math.min(max, zoomValue));
+          await trackRef.current.applyConstraints({
+            advanced: [{ zoom: clamped } as AdvancedConstraint]
+          });
+          setZoom(clamped);
+          return;
+        }
+      }
+      setZoom(zoomValue);
+    } catch (err) {
+      console.error('Failed to apply zoom constraint:', err);
+      setZoom(zoomValue);
+    }
+  }, []);
+
   const stopScanning = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    trackRef.current = null;
+    setZoomCapabilities(null);
     if (readerRef.current) {
       readerRef.current.reset();
     }
@@ -83,6 +145,10 @@ export function useScanner() {
     scan,
     isScanning,
     error,
-    hasPermission
+    hasPermission,
+    zoom,
+    zoomCapabilities,
+    changeZoom
   };
 }
+
