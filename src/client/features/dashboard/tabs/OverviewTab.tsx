@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, DollarSign, BarChart3, AlertTriangle } from 'lucide-react';
+import { Package, DollarSign, BarChart3 } from 'lucide-react';
 import { Product, ActivityLog } from '../../../data/mockData';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';

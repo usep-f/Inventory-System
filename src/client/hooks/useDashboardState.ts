@@ -47,7 +47,14 @@ export function useDashboardState() {
 
   useEffect(() => {
     fetchInitialData();
-  }, [fetchInitialData]);
+    
+    if (authPin) {
+      const intervalId = setInterval(() => {
+        fetchInitialData();
+      }, 2000);
+      return () => clearInterval(intervalId);
+    }
+  }, [fetchInitialData, authPin]);
 
   const updatePin = useCallback(async (newPin: string) => {
     try {

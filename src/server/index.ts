@@ -57,14 +57,14 @@ app.get('*', (_req, res) => {
 async function bootstrap() {
   try {
     // 1. Run migrations programmatically
-    console.log('Running database migrations...');
+    console.info('Running database migrations...');
     migrate(db, { migrationsFolder: path.join(__dirname, '../../drizzle') });
-    console.log('Migrations complete.');
+    console.info('Migrations complete.');
 
     // 2. Seed settings if empty
     let currentSettings = db.select().from(settings).limit(1).get();
     if (!currentSettings) {
-      console.log('Seeding default settings...');
+      console.info('Seeding default settings...');
       currentSettings = db.insert(settings).values({ pin: '1234', port: 3000 }).returning().get();
     }
 
