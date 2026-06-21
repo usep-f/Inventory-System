@@ -85,13 +85,14 @@ export default function ScannerLayout() {
         </button>
       </div>
 
-      <div style={{ flex: 1, position: 'relative', display: 'flex' }}>
+      <div style={{ flex: 1, position: 'relative', display: 'flex', minHeight: 0, overflow: 'hidden' }}>
         <BarcodeScanner onScan={handleScan} isActive={isCameraActive} />
       </div>
 
-      {/* Floating Mode Toggle Button (Decorative) */}
+      {/* Floating Mode Toggle Button */}
       <div style={{ position: 'absolute', bottom: 'calc(44vh - 30px)', left: '50%', transform: 'translateX(-50%)', zIndex: 20 }}>
         <button
+          onClick={() => setMode(isAdd ? 'SUBTRACT' : 'ADD')}
           className="cursor-pointer"
           style={{
             width: '64px', height: '64px', borderRadius: '50%', border: 'none',

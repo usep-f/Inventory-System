@@ -25,8 +25,27 @@ export function useScanner() {
     if (!readerRef.current) return;
 
     try {
+      // Extended interface to support mobile-specific focus modes not yet in TS DOM lib
+      interface AdvancedConstraint extends MediaTrackConstraintSet {
+        focusMode?: 'none' | 'manual' | 'single-shot' | 'continuous';
+        zoom?: number;
+      }
+
+      const constraints: MediaStreamConstraints = {
+        video: { 
+          facingMode: 'environment',
+          // Requesting high ideal resolution forces the browser to pick the main high-quality camera
+          // rather than an ultrawide/macro lens, without enforcing strict 'min' bounds that can fail on portrait mode.
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          advanced: [
+            { focusMode: 'continuous' }
+          ] as AdvancedConstraint[]
+        }
+      };
+
       // Request permission explicitly to handle errors cleanly
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setHasPermission(true);
       setError(null);
       setIsScanning(true);
@@ -34,8 +53,8 @@ export function useScanner() {
       // Stop the test stream tracks as ZXing will request its own
       stream.getTracks().forEach(track => track.stop());
 
-      readerRef.current.decodeFromVideoDevice(
-        null, // null uses default/environment camera automatically
+      readerRef.current.decodeFromConstraints(
+        constraints,
         videoElement,
         (result: Result | null) => {
           if (result) {

@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { networkInterfaces } from 'os';
+import fs from 'fs';
+import https from 'https';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { db } from './db';
 import { settings } from './schema';
@@ -70,11 +72,27 @@ async function bootstrap() {
 
     // 3. Start server
     const PORT = currentSettings.port;
-    app.listen(PORT, () => {
-      const localIp = getLocalIpAddress();
-      console.info(`Server running locally at http://localhost:${PORT}`);
-      console.info(`Network access available at http://${localIp}:${PORT}`);
-    });
+    const keyPath = path.join(__dirname, '../../key.pem');
+    const certPath = path.join(__dirname, '../../cert.pem');
+
+    if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+      const sslOptions = {
+        key: fs.readFileSync(keyPath),
+        cert: fs.readFileSync(certPath),
+      };
+      
+      https.createServer(sslOptions, app).listen(PORT, () => {
+        const localIp = getLocalIpAddress();
+        console.info(`🔒 Secure Server running at https://localhost:${PORT}`);
+        console.info(`🔒 Network access available at https://${localIp}:${PORT}`);
+      });
+    } else {
+      app.listen(PORT, () => {
+        const localIp = getLocalIpAddress();
+        console.info(`Server running locally at http://localhost:${PORT}`);
+        console.info(`Network access available at http://${localIp}:${PORT}`);
+      });
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

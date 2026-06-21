@@ -11,9 +11,15 @@ export default function BarcodeScanner({ onScan, isActive }: BarcodeScannerProps
   const videoRef = useRef<HTMLVideoElement>(null);
   const { startScanning, stopScanning, isScanning, error } = useScanner();
 
+  // Use a ref to store the latest onScan callback so we don't restart the camera stream when it changes
+  const onScanRef = useRef(onScan);
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
+
   useEffect(() => {
     if (isActive && videoRef.current) {
-      startScanning(videoRef.current, onScan);
+      startScanning(videoRef.current, (code) => onScanRef.current(code));
     } else {
       stopScanning();
     }
@@ -21,7 +27,7 @@ export default function BarcodeScanner({ onScan, isActive }: BarcodeScannerProps
     return () => {
       stopScanning();
     };
-  }, [isActive, startScanning, stopScanning, onScan]);
+  }, [isActive, startScanning, stopScanning]);
 
   return (
     <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', overflow: 'hidden' }}>
