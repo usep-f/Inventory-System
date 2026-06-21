@@ -12,6 +12,7 @@ router.get('/logs', (_req: Request, res: Response) => {
       id: logs.id,
       productId: logs.productId,
       productName: logs.productName,
+      productBarcode: logs.productBarcode,
       changeType: logs.changeType,
       quantity: logs.quantity,
       timestamp: logs.timestamp,

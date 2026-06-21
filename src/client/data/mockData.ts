@@ -11,9 +11,10 @@ export interface Product {
 
 export interface ActivityLog {
   id: number;
-  productId: number;
+  productId: number | null;
   productName: string;
-  changeType: 'ADD' | 'SUBTRACT';
+  productBarcode: string;
+  changeType: 'ADD' | 'SUBTRACT' | 'CREATE' | 'DELETE';
   quantity: number;
   timestamp: string;
 }
@@ -106,6 +107,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 1,
     productId: 1,
     productName: 'Logitech MX Master 3S',
+    productBarcode: '4902505117572',
     changeType: 'ADD',
     quantity: 12,
     timestamp: '2026-06-20T14:15:00Z'
@@ -114,6 +116,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 2,
     productId: 3,
     productName: 'Dell U2723QE Monitor',
+    productBarcode: '0190199731073',
     changeType: 'SUBTRACT',
     quantity: 2,
     timestamp: '2026-06-20T12:00:00Z'
@@ -122,6 +125,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 3,
     productId: 4,
     productName: 'Anker 8-in-1 USB-C Hub',
+    productBarcode: '0856234005118',
     changeType: 'ADD',
     quantity: 20,
     timestamp: '2026-06-20T10:30:00Z'
@@ -130,6 +134,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 4,
     productId: 5,
     productName: 'Sony WH-1000XM5',
+    productBarcode: '4549659002722',
     changeType: 'SUBTRACT',
     quantity: 3,
     timestamp: '2026-06-19T17:12:00Z'
@@ -138,6 +143,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 5,
     productId: 2,
     productName: 'Keychron K8 Pro',
+    productBarcode: '0097855171115',
     changeType: 'ADD',
     quantity: 5,
     timestamp: '2026-06-19T09:45:00Z'
@@ -146,6 +152,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 6,
     productId: 6,
     productName: 'Samsung T7 Shield 2TB',
+    productBarcode: '8806094734195',
     changeType: 'SUBTRACT',
     quantity: 1,
     timestamp: '2026-06-18T16:20:00Z'
@@ -154,6 +161,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 7,
     productId: 7,
     productName: 'WD Black SN850X 1TB',
+    productBarcode: '0718037899404',
     changeType: 'ADD',
     quantity: 8,
     timestamp: '2026-06-18T11:00:00Z'
@@ -162,6 +170,7 @@ export const INITIAL_LOGS: ActivityLog[] = [
     id: 8,
     productId: 8,
     productName: 'ASUS ROG Strix B650E-F',
+    productBarcode: '4718017293624',
     changeType: 'SUBTRACT',
     quantity: 1,
     timestamp: '2026-06-17T14:30:00Z'

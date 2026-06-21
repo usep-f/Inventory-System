@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { eq, desc } from 'drizzle-orm';
 import { db } from '../db';
-import { products, productInputSchema } from '../schema';
+import { products, logs, productInputSchema } from '../schema';
 import { z } from 'zod';
 
 const router = Router();
@@ -28,15 +28,28 @@ router.post('/', (req: Request, res: Response) => {
       return;
     }
 
-    const newProduct = db.insert(products).values({
-      barcode: data.barcode,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      quantity: data.quantity,
-      createdAt: now,
-      updatedAt: now,
-    }).returning().get();
+    const newProduct = db.transaction((tx) => {
+      const prod = tx.insert(products).values({
+        barcode: data.barcode,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        quantity: data.quantity,
+        createdAt: now,
+        updatedAt: now,
+      }).returning().get();
+
+      tx.insert(logs).values({
+        productId: prod.id,
+        productName: prod.name,
+        productBarcode: prod.barcode,
+        changeType: 'CREATE',
+        quantity: prod.quantity,
+        timestamp: now,
+      }).run();
+
+      return prod;
+    });
 
     res.status(201).json(newProduct);
   } catch (error) {
@@ -94,7 +107,26 @@ router.delete('/:id', (req: Request, res: Response) => {
       return;
     }
 
-    db.delete(products).where(eq(products.id, id)).run();
+    const existing = db.select().from(products).where(eq(products.id, id)).limit(1).get();
+    if (!existing) {
+      res.status(404).json({ error: 'NOT_FOUND', message: 'Product not found' });
+      return;
+    }
+
+    const now = new Date();
+    db.transaction((tx) => {
+      tx.delete(products).where(eq(products.id, id)).run();
+
+      tx.insert(logs).values({
+        productId: null,
+        productName: existing.name,
+        productBarcode: existing.barcode,
+        changeType: 'DELETE',
+        quantity: existing.quantity,
+        timestamp: now,
+      }).run();
+    });
+
     res.json({ success: true });
   } catch (error) {
     console.error('Delete product error:', error);

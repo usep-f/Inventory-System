@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, History, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useDashboardState } from '../../hooks/useDashboardState';
 import OverviewTab from './tabs/OverviewTab';
 import ProductsTab from './tabs/ProductsTab';
+import HistoryTab from './tabs/HistoryTab';
 import SettingsTab from './tabs/SettingsTab';
 import { PageHeader } from '../../components/shared/PageHeader';
 import { Button } from '../../components/ui/Button';
 
-type Tab = 'overview' | 'products' | 'settings';
+type Tab = 'overview' | 'products' | 'history' | 'settings';
 
 interface NavItemProps {
   label: string;
@@ -48,6 +49,7 @@ function NavItem({ label, active, onClick, icon }: NavItemProps) {
 const TAB_META: Record<Tab, { title: string; subtitle: string }> = {
   overview: { title: 'Dashboard overview', subtitle: 'Monitor your inventory health at a glance' },
   products: { title: 'Product inventory', subtitle: 'Manage, search, and update your stock items' },
+  history: { title: 'System history log', subtitle: 'Track scans, product additions, and deletions' },
   settings: { title: 'System settings', subtitle: 'Configure access, network, and server options' },
 };
 
@@ -70,6 +72,9 @@ export default function DashboardLayout() {
           deleteProduct={state.deleteProduct}
         />
       );
+    }
+    if (activeTab === 'history') {
+      return <HistoryTab logs={state.logs} />;
     }
     return (
       <SettingsTab
@@ -117,6 +122,7 @@ export default function DashboardLayout() {
           <nav style={{ display: 'flex', gap: '12px' }}>
             <NavItem label="Dashboard" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<LayoutDashboard size={18} />} />
             <NavItem label="Products" active={activeTab === 'products'} onClick={() => setActiveTab('products')} icon={<Package size={18} />} />
+            <NavItem label="History" active={activeTab === 'history'} onClick={() => setActiveTab('history')} icon={<History size={18} />} />
             <NavItem label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={18} />} />
           </nav>
         </div>

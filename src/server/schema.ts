@@ -21,7 +21,7 @@ export const logs = sqliteTable('logs', {
   productId: integer('product_id').references(() => products.id, { onDelete: 'set null' }),
   productName: text('product_name').notNull().default(''),
   productBarcode: text('product_barcode').notNull().default(''),
-  changeType: text('change_type', { enum: ['ADD', 'SUBTRACT'] }).notNull(),
+  changeType: text('change_type', { enum: ['ADD', 'SUBTRACT', 'CREATE', 'DELETE'] }).notNull(),
   quantity: integer('quantity').notNull(),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });

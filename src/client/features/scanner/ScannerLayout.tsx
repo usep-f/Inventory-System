@@ -154,7 +154,10 @@ function useScannerLayoutState() {
 
 export default function ScannerLayout() {
   const state = useScannerLayoutState();
-  const recentLogs = useMemo(() => state.logs.slice(0, 10), [state.logs]);
+  const recentLogs = useMemo(() => 
+    state.logs.filter(l => l.changeType === 'ADD' || l.changeType === 'SUBTRACT').slice(0, 10),
+    [state.logs]
+  );
   const isAdd = state.mode === 'ADD';
 
   const handleJitSuccess = async () => {
