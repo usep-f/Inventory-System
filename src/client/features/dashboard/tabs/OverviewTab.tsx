@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, DollarSign, BarChart3, AlertTriangle } from 'lucide-react';
+import { Package, DollarSign, BarChart3 } from 'lucide-react';
 import { Product, ActivityLog } from '../../../data/mockData';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
@@ -117,6 +117,13 @@ function TodayActivityDonut({ logs }: { logs: ActivityLog[] }) {
   );
 }
 
+export const LOG_META = {
+  ADD: { badgeVariant: 'success', label: 'Stock In', qtyPrefix: '+' },
+  SUBTRACT: { badgeVariant: 'error', label: 'Stock Out', qtyPrefix: '-' },
+  CREATE: { badgeVariant: 'info', label: 'Created', qtyPrefix: '+' },
+  DELETE: { badgeVariant: 'warning', label: 'Deleted', qtyPrefix: '-' },
+} as const;
+
 function RecentActivity({ logs }: { logs: ActivityLog[] }) {
   return (
     <div style={{ overflowX: 'auto' }}>
@@ -132,18 +139,16 @@ function RecentActivity({ logs }: { logs: ActivityLog[] }) {
         </thead>
         <tbody>
           {logs.slice(0, 8).map((log) => {
-            const isAdd = log.changeType === 'ADD';
+            const meta = LOG_META[log.changeType];
             const date = new Date(log.timestamp).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit', year: 'numeric' });
             return (
               <tr key={log.id}>
                 <td style={{ fontWeight: 500 }}>{log.productName}</td>
                 <td>
-                  <Badge variant={isAdd ? 'success' : 'error'}>
-                    {isAdd ? 'Stock In' : 'Stock Out'}
-                  </Badge>
+                  <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
                 </td>
                 <td style={{ textAlign: 'right', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                  {isAdd ? `+${log.quantity}` : `-${log.quantity}`}
+                  {meta.qtyPrefix}{log.quantity}
                 </td>
                 <td style={{ color: 'var(--text-secondary)' }}>{date}</td>
                 <td><Badge variant="info">Completed</Badge></td>

@@ -14,7 +14,7 @@ export function Modal({ title, isOpen, onClose, children, maxWidth = '500px' }: 
   if (!isOpen) return null;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(26, 31, 55, 0.45)', backdropFilter: 'blur(6px)', zIndex: 'var(--z-modal)' as any, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(26, 31, 55, 0.45)', backdropFilter: 'blur(6px)', zIndex: 'var(--z-modal)' as unknown, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
       <Card style={{ width: '100%', maxWidth, padding: '32px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)' }}>

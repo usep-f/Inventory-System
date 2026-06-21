@@ -6,6 +6,8 @@ interface AuthContextType {
   role: Role;
   setRole: (role: Role) => void;
   isAuthenticated: boolean;
+  authPin: string | null;
+  setAuthPin: (pin: string | null) => void;
   login: (pin: string, requestedRole: Role) => Promise<boolean>;
   logout: () => void;
 }
@@ -15,24 +17,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<Role>('guest');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authPin, setAuthPin] = useState<string | null>(null);
 
   const login = async (pin: string, requestedRole: Role) => {
-    // Basic stub for PIN validation
-    if (pin === '1234') { // TODO: Replace with real API validation
-      setRole(requestedRole);
-      setIsAuthenticated(true);
-      return true;
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, role: requestedRole })
+      });
+
+      if (response.ok) {
+        setRole(requestedRole);
+        setIsAuthenticated(true);
+        setAuthPin(pin);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
     setRole('guest');
     setIsAuthenticated(false);
+    setAuthPin(null);
   };
 
   return (
-    <AuthContext.Provider value={{ role, setRole, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ role, setRole, isAuthenticated, authPin, setAuthPin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

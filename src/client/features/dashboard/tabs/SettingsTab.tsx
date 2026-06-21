@@ -132,7 +132,7 @@ function PortForm({ currentPort, onSave }: { currentPort: string; onSave: (port:
 }
 
 export default function SettingsTab({ pin, setPin, port, setPort, ipAddress }: SettingsTabProps) {
-  const connectionUrl = `http://${ipAddress}:${port}`;
+  const connectionUrl = `${window.location.protocol}//${ipAddress}:${port}`;
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

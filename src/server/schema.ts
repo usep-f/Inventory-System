@@ -18,10 +18,18 @@ export const products = sqliteTable('products', {
 
 export const logs = sqliteTable('logs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  productId: integer('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
-  changeType: text('change_type', { enum: ['ADD', 'SUBTRACT'] }).notNull(),
+  productId: integer('product_id').references(() => products.id, { onDelete: 'set null' }),
+  productName: text('product_name').notNull().default(''),
+  productBarcode: text('product_barcode').notNull().default(''),
+  changeType: text('change_type', { enum: ['ADD', 'SUBTRACT', 'CREATE', 'DELETE'] }).notNull(),
   quantity: integer('quantity').notNull(),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
+});
+
+export const settings = sqliteTable('settings', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  pin: text('pin').notNull().default('1234'),
+  port: integer('port').notNull().default(3000),
 });
 
 // ==========================================
@@ -80,8 +88,8 @@ export const scanActionSchema = z.object({
 
 export const loginSchema = z.object({
   pin: pinSchema,
-  role: z.enum(['SCANNER', 'DASHBOARD'], {
-    errorMap: () => ({ message: 'Role must be SCANNER or DASHBOARD' })
+  role: z.enum(['pc', 'mobile'], {
+    errorMap: () => ({ message: 'Role must be pc or mobile' })
   })
 });
 
@@ -90,6 +98,8 @@ export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Log = typeof logs.$inferSelect;
 export type NewLog = typeof logs.$inferInsert;
+export type Settings = typeof settings.$inferSelect;
+export type NewSettings = typeof settings.$inferInsert;
 
 export type ProductInput = z.infer<typeof productInputSchema>;
 export type ScanActionInput = z.infer<typeof scanActionSchema>;

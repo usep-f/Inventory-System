@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 import { Product } from '../../../data/mockData';
 import { Modal } from '../../../components/ui/Modal';
 import { Input } from '../../../components/ui/Input';

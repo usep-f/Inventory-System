@@ -1,6 +1,4 @@
 import React from 'react';
-import { LogOut } from 'lucide-react';
-import { Button } from '../ui/Button';
 
 interface PageHeaderProps {
   title: string;
