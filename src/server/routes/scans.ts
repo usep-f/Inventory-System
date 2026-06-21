@@ -11,13 +11,12 @@ router.get('/logs', (_req: Request, res: Response) => {
     const allLogs = db.select({
       id: logs.id,
       productId: logs.productId,
-      productName: products.name,
+      productName: logs.productName,
       changeType: logs.changeType,
       quantity: logs.quantity,
       timestamp: logs.timestamp,
     })
     .from(logs)
-    .innerJoin(products, eq(logs.productId, products.id))
     .orderBy(desc(logs.timestamp))
     .limit(100)
     .all();
@@ -57,6 +56,8 @@ router.post('/', (req: Request, res: Response) => {
 
       tx.insert(logs).values({
         productId: product.id,
+        productName: product.name,
+        productBarcode: product.barcode,
         changeType: data.action,
         quantity: incrementAmount,
         timestamp: now,

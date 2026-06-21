@@ -5,7 +5,7 @@ import { useDashboardState } from '../../hooks/useDashboardState';
 import { useAudio } from '../../hooks/useAudio';
 import BarcodeScanner, { BarcodeScannerHandle } from './BarcodeScanner';
 import JitModal from './JitModal';
-import { Product, ActivityLog } from '../../data/mockData';
+import { ActivityLog } from '../../data/mockData';
 
 function LogoutButton() {
   const { logout } = useAuth();
@@ -47,10 +47,9 @@ function HeaderControls({ onReset }: HeaderControlsProps) {
 
 interface RecentScansListProps {
   recentLogs: ActivityLog[];
-  products: Product[];
 }
 
-function RecentScansList({ recentLogs, products }: RecentScansListProps) {
+function RecentScansList({ recentLogs }: RecentScansListProps) {
   return (
     <div style={{ flex: 1, overflowY: 'auto' }}>
       <h3 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Recent scans</h3>
@@ -59,8 +58,7 @@ function RecentScansList({ recentLogs, products }: RecentScansListProps) {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '20px' }}>No recent scans</p>
         )}
         {recentLogs.map((log) => {
-          const product = products.find(p => p.id === log.productId);
-          const name = product ? product.name : 'Unknown Product';
+          const name = log.productName || 'Unknown Product';
           const isLogAdd = log.changeType === 'ADD';
           return (
             <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: 'var(--page-bg)', borderRadius: '10px' }}>
@@ -194,7 +192,7 @@ export default function ScannerLayout() {
 
       <div style={{ height: '44vh', background: 'var(--card-bg)', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', padding: '24px 20px', display: 'flex', flexDirection: 'column', boxShadow: '0 -8px 32px rgba(0,0,0,0.12)', zIndex: 10 }}>
         <ModeToggle mode={state.mode} setMode={state.setMode} />
-        <RecentScansList recentLogs={recentLogs} products={state.products} />
+        <RecentScansList recentLogs={recentLogs} />
       </div>
 
       {state.jitBarcode && (

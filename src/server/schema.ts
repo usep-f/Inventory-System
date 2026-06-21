@@ -18,7 +18,9 @@ export const products = sqliteTable('products', {
 
 export const logs = sqliteTable('logs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  productId: integer('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  productId: integer('product_id').references(() => products.id, { onDelete: 'set null' }),
+  productName: text('product_name').notNull().default(''),
+  productBarcode: text('product_barcode').notNull().default(''),
   changeType: text('change_type', { enum: ['ADD', 'SUBTRACT'] }).notNull(),
   quantity: integer('quantity').notNull(),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),

@@ -42,7 +42,7 @@ function useJitForm(
       barcode,
       name,
       price: isNaN(priceNum) ? -1 : priceNum,
-      quantity: 1, // Quantity is locked to 1
+      quantity: 0, // Set to 0 so the subsequent scan call correctly increments it
       description: null,
     });
 
